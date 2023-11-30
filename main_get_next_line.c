@@ -11,7 +11,7 @@ int main()
 	{
 		line = get_next_line(fd);
 		if (line == NULL)
-			break ;
+			return (1);
 		printf("%s", line);
 		free(line);
 	}
