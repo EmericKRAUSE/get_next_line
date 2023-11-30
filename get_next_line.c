@@ -36,6 +36,7 @@ void	read_and_stash(int fd, t_list *stash, int *readed)
 			return ;
 		}
 		buf[readed] = '\0';
+		add_to_stash(stash, buf, *readed);
 	}
 }
 
@@ -65,4 +66,32 @@ t_list *get_last_node(t_list *stash)
 	while (last_node && last_node->next)
 		last_node = last_node->next;
 	return (last_node);
+}
+
+void add_to_stash(t_list **stash, char *buf, int readed)
+{
+	int		i;
+	t_list	*last;
+	t_list	*new_node;
+
+	new_node = malloc(sizeof(t_list));
+	if (!new_node)
+		return ;
+	new_node->next = NULL;
+	new_node->content = malloc(sizeof(char) * (readed + 1));
+	if (!new_node->content)
+		return ;
+	i = 0;
+	while (buff[i] && i < readed)
+	{
+		new_node->content[i] = buf[i];
+		i++;
+	}
+	new_node->content[i] = '\n';
+	if (*stash == NULL)
+	{
+		*stash = new_node;
+		return ;
+	}
+	last = get_last_node(*stash);
 }
