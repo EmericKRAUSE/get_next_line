@@ -1,28 +1,5 @@
 #include "get_next_line.h"
-
-char *get_next_line(int fd)
-{
-	char			*buf;
-	static char		*stash;
-	char			*line;
-	int				readed;
-
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	while (found_newline(stash) == 0)
-	{
-		buf = malloc(sizeof(char) * BUFFER_SIZE + 1);
-		if (!buf)
-			return (NULL);
-		readed = read(fd, buf, BUFFER_SIZE);
-		buf[readed] = '\0';
-		stash = add_to_stash(buf, stash, readed);
-		free (buf);
-	}
-	line = extract_line(stash);
-	clear_stash();
-	return (line);
-}
+#include <stdio.h>
 
 char	*add_to_stash(char *stash, char *buf, int readed)
 {
@@ -31,13 +8,14 @@ char	*add_to_stash(char *stash, char *buf, int readed)
 
 	i = 0;
 	j = 0;
-	while (stash[i])
-		i++;
-	while (buf[i + j] && j < readed)
+	//while (stash[i])
+		//i++;
+	while (j == 0)
 	{
+		printf ("test\n");
 		stash[i + j] = buf[i + j];
 		j++;
-	}
+	} 
 	return (stash);
 }
 
@@ -45,6 +23,8 @@ int	found_newline(char *stash)
 {
 	int	i;
 
+	if (!stash)
+		return (0);
 	i = 0;
 	while (stash[i])
 	{
@@ -61,6 +41,8 @@ char	*extract_line(char *stash)
 	int		j;
 	char	*line;
 
+	if (!stash)
+		return (NULL);
 	i = 0;
 	while (stash[i] && stash [i] != '\n')
 		i++;
@@ -77,13 +59,14 @@ char	*extract_line(char *stash)
 	return (line);
 }
 
-
 char	*clear_stash(char *stash)
 {
 	char	*temp;
 	int		i;
 	int		j;
 
+	if (!stash)
+		return (NULL);
 	i = 0;
 	while (stash[i] && stash[i] != '\n')
 		i++;
@@ -98,28 +81,40 @@ char	*clear_stash(char *stash)
 	stash = ft_bzero(stash);
 	i = 0;
 	while (temp[i])
-		stash[i] = temp[i++];
+	{
+		stash[i] = temp[i];
+		i++;
+	}
 	stash[i] = '\0';
 	free (temp);
 	return (stash);
 }
 
-char	*ft_bzero(char *stash)
+char *get_next_line(int fd)
 {
-	int	i;
+	char			*buf;
+	static char		*stash;
+	char			*line;
+	int				readed;
 
-	i = 0;
-	while (stash[i])
-		stash[i++] = 0;
-	return (stash);
-}
+	buf = NULL;
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, buf, 0) < 0)
+		return (NULL);
+	readed = 1;
+	while (found_newline(stash) == 0 && readed > 0)
+	{
+		buf = malloc(sizeof(char) * BUFFER_SIZE + 1);
+		if (!buf)
+			return (NULL);
+		readed = read(fd, buf, BUFFER_SIZE);
+		buf[readed] = '\0';
 
-int	ft_strlen(char *stash)
-{
-	int	i;
-
-	i = 0;
-	while (stash[i])
-		i++;
-	return (i);
+		printf ("buf: %s\n", buf);
+		
+		stash = add_to_stash(buf, stash, readed);
+		free (buf);
+	}
+	line = extract_line(stash);
+	stash = clear_stash(stash);
+	return (line);
 }

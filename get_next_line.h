@@ -3,15 +3,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-# ifndef BUFFER_SIZE
-#define BUFFER_SIZE 5
-# endif
-
-typedef	struct	s_list
-{
-	char			*content;
-	struct s_list	*next;
-}					t_list;
-
+int		ft_strlen(char *stash);
+char	*ft_bzero(char *stash);
+char	*get_next_line(int fd);
+char	*clear_stash(char *stash);
+char	*extract_line(char *stash);
+int		found_newline(char *stash);
+char	*add_to_stash(char *stash, char *buf, int readed);
 
 # endif
