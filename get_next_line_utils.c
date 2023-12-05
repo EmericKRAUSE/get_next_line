@@ -63,3 +63,79 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 		}
 	}
 }
+
+int	ft_lstlen(t_list *lst)
+{
+	int	i;
+	int	count;
+
+	count = 0;
+	while (lst != NULL)
+	{
+		if (lst->data != NULL)
+		{
+			i = 0;
+			while (lst->data[i])
+			{
+				if (lst->data[i] == '\n')
+				{
+					count++;
+					return (count);
+				}
+				else
+				{
+					i++;
+					count++;
+				}
+			}
+		}
+		lst = lst->next;
+	}
+	return (count);
+}
+
+char	*ft_lstcpy(t_list *lst, char *line)
+{
+	int	i;
+	int j;
+
+	j = 0;
+	while (lst != NULL)
+	{
+		if (lst->data != NULL)
+		{
+			i = 0;
+			while (lst->data[i])
+			{
+				if (lst->data[i] == '\n')
+				{
+					line[j] = lst->data[i];
+					break;
+				}
+				else
+					line[j] = lst->data[i]; 
+				i++;
+				j++;
+			}
+		}
+		lst = lst->next;
+	}
+	line[j] = '\0';
+	return (line);
+}
+
+void	ft_lstclear(t_list **lst)
+{
+	t_list *temp;
+
+	if (*lst != NULL && lst != NULL)
+	{
+		while (*lst != NULL)
+		{
+			temp = *lst;
+			*lst = (*lst)->next;
+			free(temp->data);
+			free(temp);
+		}
+	}
+}

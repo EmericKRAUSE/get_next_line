@@ -1,7 +1,7 @@
 #include "get_next_line.h"
 #include <stdio.h>
 
-void	add_to_stash(t_list **stash, char *buf, int readed)
+void	add_to_stash(t_list **stash, char *buf)
 {
 	t_list	*new_node;
 
@@ -17,12 +17,15 @@ int	found_newline(t_list *stash)
 
 	while (stash != NULL)
 	{
-		i = 0;
-		while (stash->data[i])
+		if (stash->data != NULL)
 		{
-			if (stash->data[i] == '\n' || stash->data[i] == '\0')
-				return (1);
-			i++;
+			i = 0;
+			while (stash->data[i])
+			{
+				if (stash->data[i] == '\n' || stash->data[i] == '\0')
+					return (1);
+				i++;
+			}
 		}
 		stash = stash->next;
 	}
@@ -31,57 +34,45 @@ int	found_newline(t_list *stash)
 
 char	*extract_line(t_list *stash)
 {
-	int		i;
-	int		j;
+	t_list	*last_node;
 	char	*line;
 
-	if (!stash)
-		return (NULL);
-	i = 0;
-	while (stash[i] && stash [i] != '\n')
-		i++;
-	line = malloc(sizeof(char) * i + 1);
+	last_node = ft_lstlast(stash);
+	line = malloc(sizeof(char) * ft_lstlen(stash) + 1);
 	if (!line)
 		return (NULL);
-	j = 0;
-	while (stash[j] && j < i)
-	{
-		line[j] = stash[j];
-		j++;
-	}
-	line[j] = '\0';
+	line = ft_lstcpy(last_node, line);
 	return (line);
 }
 
-char	*clear_stash(char *stash)
+void	clear_stash(t_list **stash)
 {
-	char	*temp;
+	char	*new_data;
+	t_list	*last_node;
 	int		i;
 	int		j;
 
-	if (!stash)
-		return (NULL);
-	i = 0;
-	while (stash[i] && stash[i] != '\n')
-		i++;
-	i++;
-	temp = malloc(sizeof(char) * (ft_strlen(stash) - i + 1));
-	if (!temp)
-		return  (NULL);
 	j = 0;
-	while (stash[i])
-		temp[j++] = stash[i++];
-	temp[j] = '\0';
-	stash = ft_bzero(stash);
 	i = 0;
-	while (temp[i])
-	{
-		stash[i] = temp[i];
+	last_node = ft_lstlast(*stash);
+	while (last_node->data[i] && last_node->data[i] != '\n')
 		i++;
+	if (last_node->data[i] == '\n')
+	{
+		i++;
+		while (last_node->data[i + j])
+			j++;
+		new_data = malloc(sizeof(char) * (j + 1));
+		if (!new_data)
+			return ;
+		j = 0;
+		while (last_node->data[i + j])
+		 	new_data[j++] = last_node->data[i++];
+		new_data[j] = '\0';
+		ft_lstclear(stash);
+		*stash = ft_lstnew(new_data);
+		free(new_data);
 	}
-	stash[i] = '\0';
-	free (temp);
-	return (stash);
 }
 
 char *get_next_line(int fd)
@@ -98,20 +89,12 @@ char *get_next_line(int fd)
 	readed = 1;
 	while (found_newline(stash) == 0 && readed > 0)
 	{
-		if (!buf)
-			return (NULL);
 		readed = read(fd, buf, BUFFER_SIZE);
-		if (read <= 0)
-			break;
+		printf ("%d", readed);
 		buf[readed] = '\0';
-		add_to_stash(&stash, buf, readed);
-		while (stash != NULL)
-		{
-			printf("%s", stash->data);
-			stash = stash->next;
-		}
+		add_to_stash(&stash, buf);
 	}
 	line = extract_line(stash);
-	stash = clear_stash(stash);
+	clear_stash(&stash);
 	return (line);
 }
