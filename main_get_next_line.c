@@ -7,7 +7,7 @@ int main()
 	int		fd;
 	char	*line;
 	int		i;
-	
+
 	i = 0 ;
 	fd = open("GNL.txt", O_RDONLY);
 	if (fd < 0)
@@ -18,6 +18,7 @@ int main()
 		printf("%s", line);
 		i++;
 	}
-	close  (fd);
+	close(fd);
+	free(line);
 	return (0);
 }

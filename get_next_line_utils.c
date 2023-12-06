@@ -4,9 +4,9 @@ t_list	*ft_lstlast(t_list *lst)
 {
 	t_list	*last_node;
 
-	last_node = lst;
 	if (lst == NULL)
 		return (NULL);
+	last_node = lst;
 	while (last_node && last_node->next)
 		last_node = last_node->next;
 	return (last_node);
@@ -26,16 +26,18 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 	}
 }
 
-void	free_stash(t_list **lst)
+void	free_stash(t_list *stash)
 {
-	t_list *tmp;
+	t_list	*current;
+	t_list	*next;
 
-	while (*lst)
-	{ 
-		tmp = *lst;
-		*lst = (*lst)->next;
-		free(tmp->data);
-		free (tmp);
+	current = stash;
+	while (current)
+	{
+		free(current->data);
+		next = current->next;
+		free(current);
+		current = next;
 	}
 }
 

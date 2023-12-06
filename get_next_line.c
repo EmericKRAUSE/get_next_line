@@ -6,28 +6,34 @@ void	clear_stash(t_list **stash)
 	t_list *clean_node;
 	int i;
 	int	j;
+
 	clean_node = malloc(sizeof(t_list));
 	if (!clean_node || !stash)
+	{
+		free_stash(*stash);
 		return ;
+	}
 	clean_node->next = NULL;
 	last = ft_lstlast(*stash);
 	i = 0;
 	while (last->data[i] && last->data[i] != '\n')
 		i++;
-	if (last->data[i] == '\n')
+	if (last->data[i] && last->data[i]== '\n')
 		i++;
 	clean_node->data = malloc(sizeof(char) * ((ft_strlen(last->data) - i) + 1));
 	if (!clean_node->data)
 	{
-		free (clean_node);
+		free_stash(*stash);
+		free(clean_node);
 		return ;
 	}
 	j = 0;
 	while (last->data[i])
 		clean_node->data[j++] = last->data[i++];
 	clean_node->data[j] = '\0';
-	free_stash(stash);
+	free_stash(*stash);
 	*stash = clean_node;
+	free(clean_node);
 }
 
 void	generate_line(char **line, t_list *stash)
@@ -36,7 +42,7 @@ void	generate_line(char **line, t_list *stash)
 	int j;
 
 	j = 0;
-	while(stash)
+	while (stash)
 	{
 		i = 0;
 		while (stash->data[i])
@@ -59,12 +65,12 @@ void	extract_line(t_list *stash, char **line)
 	int	i;
 	int j;
 
-	 j = 0;
-	if (stash == NULL || line == NULL)
+	if (stash == NULL)
 		return ;
 	generate_line(line, stash);
-	if (line == NULL)
+	if (*line == NULL)
 		return ;
+	j = 0;
 	while (stash)
 	{
 		i = 0;
@@ -72,7 +78,7 @@ void	extract_line(t_list *stash, char **line)
 		{
 			if (stash->data[i] == '\n')
 			{
-				*line[j++] = stash->data[i];
+				(*line)[j++] = stash->data[i];
 				break;
 			}
 			(*line)[j++] = stash->data[i++];
@@ -88,13 +94,11 @@ void	add_to_stash(t_list **stash, char *buf, int readed)
 	t_list *last_node;
 	int i;
 
-	if (buf == NULL)
-		return ;
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 		return ;
 	new_node->next = NULL;
-	new_node->data = malloc(sizeof(readed) + 1);
+	new_node->data = malloc(sizeof(char) * (readed + 1));
 	if (!new_node->data)
 	{
 		free (new_node);
@@ -108,12 +112,12 @@ void	add_to_stash(t_list **stash, char *buf, int readed)
 	}
 	new_node->data[i] = '\0';
 	if (*stash == NULL)
-		*stash = new_node;
-	else
 	{
-		last_node = ft_lstlast(*stash);
-		last_node->next = new_node;
+		*stash = new_node;
+		return ;
 	}
+	last_node = ft_lstlast(*stash);
+	last_node->next = new_node;
 }
                              
 int	found_newline(t_list *stash)
@@ -146,22 +150,22 @@ void	read_and_stash(int fd, t_list **stash)
 		if (!buf)
 			return ;
 		readed = (int)read(fd, buf, BUFFER_SIZE);
-		if (*stash == NULL && readed < 1)
+		if ((*stash == NULL && readed == 0) || readed == -1)
 		{
-			free (buf);
+			free(buf);
 			return ;
 		}
 		buf[readed] = '\0';
 		add_to_stash(stash, buf, readed);
-		free (buf);
+		free(buf);
 	}
 
 }
 
 char *get_next_line(int fd)
 {
-	t_list	*stash;
-	char	*line;
+	static t_list	*stash;
+	char			*line;
 
 	stash = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0)
@@ -169,7 +173,7 @@ char *get_next_line(int fd)
 	read_and_stash(fd, &stash);
 	if (stash == NULL)
 	{
-		free_stash(&stash);
+		free_stash(stash);
 		return (NULL);
 	}
 		

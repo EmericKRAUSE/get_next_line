@@ -16,7 +16,7 @@ typedef struct s_list
 char	*get_next_line(int fd);
 t_list	*ft_lstlast(t_list *lst);
 void	ft_lstadd_back(t_list **lst, t_list *new);
-void	free_stash(t_list **lst);
+void	free_stash(t_list *lst);
 int		ft_strlen(char *str);
 void	read_and_stash(int fd, t_list **lst);
 
