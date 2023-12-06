@@ -7,6 +7,7 @@ int main()
 	int		fd;
 	char	*line;
 	int		i;
+	
 	i = 0 ;
 	fd = open("GNL.txt", O_RDONLY);
 	if (fd < 0)
