@@ -12,13 +12,15 @@ int main()
 	fd = open("GNL.txt", O_RDONLY);
 	if (fd < 0)
 		printf("error");
-	while (i < 10)
+	while (1)
 	{
 		line = get_next_line(fd);
 		printf("%s", line);
+		if (line == NULL)
+			break ;
+		free (line);
 		i++;
 	}
 	close(fd);
-	free(line);
 	return (0);
 }

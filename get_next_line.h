@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-/*# ifndef BUFFER_SIZE
+# ifndef BUFFER_SIZE
 #define BUFFER_SIZE=42
-# endif*/
+# endif
 
 typedef struct s_list
 {
